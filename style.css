@@ -1,0 +1,18 @@
+/* Estilos personalizados del proyecto */
+body { 
+    font-family: 'Inter', sans-serif; 
+}
+
+/* Estado seleccionado de las casillas de netbooks (Color verde destacado) */
+.netbook-checkbox:checked + label {
+    background-color: #10b981; /* Verde Emerald */
+    color: #ffffff;
+    border-color: #059669;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3), 0 2px 4px -1px rgba(16, 185, 129, 0.06);
+    transform: translateY(-1px);
+}
+
+/* Transición suave para las tarjetas de casillas */
+.netbook-card {
+    transition: all 0.2s ease-in-out;
+}
