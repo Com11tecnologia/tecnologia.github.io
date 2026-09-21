@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Control de Netbooks - Espacio Digital</title>
+    <!-- Tailwind CSS desde CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Iconos Lucide -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- Fuente Google Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Hojas de estilo personalizadas -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+    <!-- Encabezado con Métricas al estilo de la referencia -->
+    <header class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                        <i data-lucide="laptop" class="w-8 h-8 text-blue-200"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Espacio Digital - Control de Netbooks</h1>
+                        <p class="text-xs sm:text-sm text-blue-100/80">Registro diario de préstamos y devolución de equipos</p>
+                    </div>
+                </div>
+
+                <!-- Métricas diarias de equipos (Asignadas y Devueltas) -->
+                <div class="flex items-center space-x-3 bg-white/10 backdrop-blur-md p-2 sm:p-3 rounded-xl border border-white/20 shadow-inner">
+                    <div class="text-center px-3 py-1 bg-blue-950/40 rounded-lg">
+                        <span class="block text-xs font-medium text-blue-200 uppercase tracking-wider">Hoy Asignadas</span>
+                        <span id="counter-asignadas" class="text-2xl font-extrabold text-amber-300">0</span>
+                    </div>
+                    <div class="h-8 w-px bg-white/20"></div>
+                    <div class="text-center px-3 py-1 bg-blue-950/40 rounded-lg">
+                        <span class="block text-xs font-medium text-blue-200 uppercase tracking-wider">Hoy Devueltas</span>
+                        <span id="counter-devueltas" class="text-2xl font-extrabold text-emerald-300">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Formulario principal -->
+        <form id="loanForm" class="space-y-8" onsubmit="handleSubmit(event)">
+            
+            <!-- SECCIÓN 1: DATOS DEL PRÉSTAMO -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center space-x-3 mb-6 pb-3 border-b border-slate-100">
+                    <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                        <i data-lucide="calendar" class="w-5 h-5"></i>
+                    </div>
+                    <h2 class="text-lg font-semibold text-slate-800">1. Datos del Préstamo</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Fecha -->
+                    <div>
+                        <label for="fecha" class="block text-sm font-medium text-slate-700 mb-1">Fecha <span class="text-red-500">*</span></label>
+                        <input type="date" id="fecha" name="fecha" required
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                    </div>
+
+                    <!-- Turno (Mañana, Tarde, Noche) -->
+                    <div>
+                        <label for="turno" class="block text-sm font-medium text-slate-700 mb-1">Turno <span class="text-red-500">*</span></label>
+                        <select id="turno" name="turno" required
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            <option value="">Seleccione turno</option>
+                            <option value="Mañana">Mañana</option>
+                            <option value="Tarde">Tarde</option>
+                            <option value="Noche">Noche</option>
+                        </select>
+                    </div>
+
+                    <!-- Sector -->
+                    <div>
+                        <label for="sector" class="block text-sm font-medium text-slate-700 mb-1">Sector <span class="text-red-500">*</span></label>
+                        <select id="sector" name="sector" required onchange="handleSectorChange()"
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                            <option value="">Seleccione sector</option>
+                            <option value="Biblioteca">Biblioteca</option>
+                            <option value="Espacio Digital">Espacio Digital</option>
+                            <option value="Secretaría">Secretaría</option>
+                        </select>
+                    </div>
+
+                    <!-- Carro (Dependiente del Sector) -->
+                    <div>
+                        <label for="carro" class="block text-sm font-medium text-slate-700 mb-1">Carro Asignado <span class="text-red-500">*</span></label>
+                        <select id="carro" name="carro" required disabled
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-slate-50">
+                            <option value="">Primero seleccione sector</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: INFORMACIÓN DEL DOCENTE Y ESTUDIANTE -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center space-x-3 mb-6 pb-3 border-b border-slate-100">
+                    <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </div>
+                    <h2 class="text-lg font-semibold text-slate-800">2. Información del Docente y Estudiante</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Búsqueda / Nombre Docente -->
+                    <div>
+                        <label for="docente_input" class="block text-sm font-medium text-slate-700 mb-1">Apellido y Nombre del Docente <span class="text-red-500">*</span></label>
+                        <input type="text" id="docente_input" list="docentes_list" placeholder="Ingrese o busque docente..." required oninput="handleDocenteSelect()"
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        <datalist id="docentes_list"></datalist>
+                    </div>
+
+                    <!-- Área (Opcional) -->
+                    <div>
+                        <label for="area" class="block text-sm font-medium text-slate-700 mb-1">Área <span class="text-xs text-slate-400">(Opcional)</span></label>
+                        <input type="text" id="area" name="area" placeholder="Ej. AREA EXACTAS"
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                    </div>
+
+                    <!-- Correo Electrónico (Opcional) -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Correo Electrónico <span class="text-xs text-slate-400">(Opcional)</span></label>
+                        <input type="email" id="email" name="email" placeholder="docente@bue.edu.ar"
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                    </div>
+
+                    <!-- Apellido Estudiante (Opcional) -->
+                    <div>
+                        <label for="estudiante_apellido" class="block text-sm font-medium text-slate-700 mb-1">Apellido del Estudiante <span class="text-xs text-slate-400">(Opcional)</span></label>
+                        <input type="text" id="estudiante_apellido" name="estudiante_apellido" placeholder="Apellido del alumno"
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                    </div>
+
+                    <!-- Nombre Estudiante (Opcional) -->
+                    <div>
+                        <label for="estudiante_nombre" class="block text-sm font-medium text-slate-700 mb-1">Nombre del Estudiante <span class="text-xs text-slate-400">(Opcional)</span></label>
+                        <input type="text" id="estudiante_nombre" name="estudiante_nombre" placeholder="Nombre del alumno"
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                    </div>
+
+                    <!-- N° de Serie (Opcional) -->
+                    <div>
+                        <label for="numero_serie" class="block text-sm font-medium text-slate-700 mb-1">N° de Serie de Equipo <span class="text-xs text-slate-400">(Opcional)</span></label>
+                        <input type="text" id="numero_serie" name="numero_serie" placeholder="Ej. SN12345678"
+                            class="w-full rounded-lg border-slate-300 border px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 3: SELECCIÓN MÚLTIPLE DE COMPUTADORAS (1-40) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 pb-3 border-b border-slate-100 gap-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
+                            <i data-lucide="grid" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold text-slate-800">3. Selección de Netbooks (Casillas 1 al 40)</h2>
+                            <p class="text-xs text-slate-500">Haz clic en las casillas para marcar los equipos seleccionados (se resaltarán en verde)</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button type="button" onclick="selectAll(true)" class="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md transition">
+                            Marcar Todas
+                        </button>
+                        <button type="button" onclick="selectAll(false)" class="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md transition">
+                            Desmarcar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grilla 1 a 40 -->
+                <div class="grid grid-cols-4 sm:grid-cols-8 md:grid-cols-10 gap-2.5" id="netbooks-grid"></div>
+            </div>
+
+            <!-- ENVIAR CORREO (OPCIONAL) Y ACCIONES -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <input type="checkbox" id="send_email_option" name="send_email_option"
+                        class="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer">
+                    <label for="send_email_option" class="text-sm font-medium text-slate-700 cursor-pointer">
+                        Enviar notificación por correo electrónico al docente (Opcional)
+                    </label>
+                </div>
+
+                <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
+                    <button type="button" onclick="resetForm()" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition">
+                        Limpiar Formulario
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition flex items-center space-x-2">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        <span>Registrar Préstamo</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- HISTORIAL DE REGISTROS -->
+        <div class="mt-10 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800">Historial de Registros</h3>
+                    <p class="text-xs text-slate-500">Haz clic en el icono para alternar el estado de devolución de los equipos</p>
+                </div>
+                <!-- Botón de Exportar a Excel/Planilla -->
+                <button onclick="exportToCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center space-x-2 self-start sm:self-auto">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                    <span>Exportar a Excel (.csv)</span>
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-600">
+                    <thead class="bg-slate-50 text-slate-700 font-medium uppercase text-xs tracking-wider border-b border-slate-200">
+                        <tr>
+                            <th class="px-4 py-3">Fecha</th>
+                            <th class="px-4 py-3">Docente</th>
+                            <th class="px-4 py-3">Área / Mail</th>
+                            <th class="px-4 py-3">Ubicación</th>
+                            <th class="px-4 py-3">Equipos</th>
+                            <th class="px-4 py-3">Estado</th>
+                            <th class="px-4 py-3 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-table-body" class="divide-y divide-slate-100">
+                        <!-- Se llena mediante Javascript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Script de lógica JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
